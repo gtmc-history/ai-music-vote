@@ -886,8 +886,12 @@ Outro. (A Vow to the Future)
             const html = `
                 <div class="container">
                     <header>
-                        <h1>🎵 학생 창작곡 감상 & 투표</h1>
-                        <p class="subtitle">Suno AI로 만든 우리들의 이야기</p>
+                        <div style="font-size: 1rem; color: #00ff88; margin-bottom: 15px; font-weight: 600; letter-spacing: 2px;">
+                            한국사 프로젝트 활동
+                        </div>
+                        <h1 style="font-size: 3rem; margin-bottom: 15px;">시대를 노래하다</h1>
+                        <p class="subtitle" style="font-size: 1.2rem; margin-bottom: 10px;">🎵 학생 창작곡 감상 & 투표</p>
+                        <p style="font-size: 0.95rem; color: #a0a0a0;">Suno AI로 만든 우리들의 이야기</p>
                     </header>
 
                     <div class="filters">
@@ -953,26 +957,16 @@ Outro. (A Vow to the Future)
                     </div>
 
                     <div class="results-section">
-                        <h2 class="results-title">🏆 투표 결과</h2>
-                        <div class="stats">
-                            <div class="stats-number">${totalVotes}</div>
-                            <div>총 투표 수</div>
-                        </div>
-                        <div style="margin-top: 30px;">
-                            ${sortedResults.map((song, index) => `
-                                <div class="result-item">
-                                    <div>
-                                        <span style="color: #00d4ff; margin-right: 10px; font-size: 1.2rem;">
-                                            ${index + 1}위
-                                        </span>
-                                        <span class="result-name">${song.title}</span>
-                                        <span style="color: #a0a0a0; margin-left: 10px; font-size: 0.9rem;">
-                                            (${song.theme})
-                                        </span>
-                                    </div>
-                                    <div class="result-votes">${song.voteCount}표</div>
-                                </div>
-                            `).join('')}
+                        <div style="padding: 40px; background: rgba(0, 212, 255, 0.1); border-radius: 15px; text-align: center; border: 2px solid #00d4ff;">
+                            <div style="font-size: 3rem; margin-bottom: 20px;">📅</div>
+                            <h3 style="color: #00d4ff; font-size: 1.8rem; margin-bottom: 20px;">최종 투표 결과 발표</h3>
+                            <p style="font-size: 1.3rem; color: #fff; margin-bottom: 20px;">
+                                <strong>[2025.12.5.(금) 16:30]</strong>
+                            </p>
+                            <p style="color: #a0a0a0; font-size: 1rem; line-height: 1.8;">
+                                모든 투표는 구글 스프레드시트에 자동으로 수집됩니다.<br>
+                                투표 마감 후 최종 집계 결과를 공개할 예정입니다.
+                            </p>
                         </div>
                     </div>
                 </div>
