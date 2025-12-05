@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시대를 노래하다 - Final Results</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* --- 1. RESET & BASE --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #050505 0%, #1a1a1a 100%); /* 더 깊은 블랙 배경 */
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* --- 2. HEADER & TABS --- */
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+        }
+
+        .badge-header {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(57, 255, 20, 0.1);
+            color: #39ff14;
+            border: 1px solid rgba(57, 255, 20, 0.3);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        h1 {
+            font-size: 3.5rem; /* 메인 타이틀 크기 증가 */
+            margin-bottom: 5px; /* 간격 조정 */
+            background: linear-gradient(to right, #fff, #888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            color: #888; /* 서브 타이틀 색상 */
+            font-size: 1.2rem; /* 서브 타이틀 크기 */
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .tab-nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            margin-bottom: 40px;
+        }
+
+        .tab-btn {
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            color: #888;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-btn.active {
+            background: #39ff14; /* Neon Green */
+            color: #000;
+            border-color: #39ff14;
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
+        }
+
+        /* --- 3. RESULTS VIEW (Bento Grid) --- */
+        .result-view {
+            display: none; /* JS로 제어 */
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .result-view.active { display: block; }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr; /* 좌:우 비율 */
+            gap: 20px;
+        }
+
+        /* 3.1 Winner Card (Left) */
+        .winner-card {
+            background: #111;
+            border-radius: 20px;
+            border: 1px solid #333;
+            overflow: hidden;
+            position: relative;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 40px;
+        }
+
+        .winner-bg {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.95) 90%), url('http://googleusercontent.com/image_collection/image_retrieval/6549077190555611668');
+            background-size: cover; background-position: center;
+            transition: transform 10s ease;
+        }
+        .winner-card:hover .winner-bg { transform: scale(1.05); }
+
+        .winner-content { position: relative; z-index: 2; }
+
+        .rank-badge {
+            background: #39ff14; color: #000;
+            font-weight: 800; padding: 5px 12px;
+            border-radius: 4px; display: inline-block; margin-bottom: 15px;
+        }
+
+        .winner-title {
+            font-size: 3.5rem; font-weight: 900; line-height: 1.1; margin-bottom: 15px;
+            color: #fff;
+        }
+        
+        .winner-stats {
+            display: flex; gap: 15px; align-items: center;
+            margin-top: 20px;
+        }
+        .vote-big { font-size: 2rem; font-weight: 700; color: #39ff14; }
+        .tag-pill {
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 5px 15px; border-radius: 20px;
+            font-size: 0.9rem; color: #ccc;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
+        }
+
+        /* 3.2 Right Column Stack */
+        .right-col {
+            display: flex; flex-direction: column; gap: 20px;
+        }
+
+        .runner-row {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+        }
+
+        .runner-card {
+            background: #161616; border-radius: 16px; padding: 20px;
+            border: 1px solid #2a2a2a; position: relative; overflow: hidden;
+            min-height: 180px; display: flex; flex-direction: column; justify-content: space-between;
+        }
+
+        .runner-rank { font-size: 2rem; font-weight: 800; color: #555; }
+        .rank-2 { color: #e0e0e0; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+        .rank-3 { color: #cd7f32; text-shadow: 0 0 10px rgba(205,127,50,0.2); }
+
+        .analytics-box {
+            background: #111; border-radius: 16px; padding: 25px;
+            border: 1px solid #2a2a2a; flex-grow: 1;
+        }
+
+        .list-header {
+            font-size: 0.9rem; font-weight: 700; color: #888; margin-bottom: 15px;
+            padding-bottom: 10px; border-bottom: 1px solid #222;
+        }
+
+        .rank-item {
+            display: flex; justify-content: space-between; padding: 8px 0;
+            border-bottom: 1px solid #222; font-size: 0.95rem;
+        }
+        .rank-num { width: 30px; color: #555; font-weight: 700; }
+        .rank-name { flex: 1; color: #ccc; }
+        .rank-val { color: #39ff14; font-weight: 700; }
+
+        /* Chart Bars */
+        .chart-row { margin-bottom: 12px; }
+        .chart-label { display: flex; justify-content: space-between; font-size: 0.8rem; color: #aaa; margin-bottom: 5px; }
+        .chart-bg { background: #222; height: 8px; border-radius: 4px; overflow: hidden; }
+        .chart-fill { height: 100%; border-radius: 4px; width: 0; transition: width 1.5s ease-out; }
+
+        /* --- 4. LIST VIEW (Original Grid) --- */
+        .list-view {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        .list-view.active { display: block; }
+
+        /* 4.1 Filter Bar */
+        .list-filter-bar {
+            display: flex; justify-content: center; gap: 10px;
+            margin-bottom: 30px;
+            padding: 10px; background: rgba(255,255,255,0.03);
+            border-radius: 50px; width: fit-content; margin-left: auto; margin-right: auto;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .filter-chip {
+            padding: 8px 20px; border-radius: 25px; border: none;
+            background: transparent; color: #888; font-weight: 600; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-chip:hover { color: #fff; background: rgba(255,255,255,0.1); }
+        
+        .filter-chip.active {
+            background: #8b5cf6; color: #fff; /* Purple for List */
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
+
+        .songs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 60px;
+        }
+        
+        .song-card {
+            background: rgba(30, 41, 59, 0.4);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            transition: transform 0.3s;
+            position: relative;
+        }
+        .song-card:hover { transform: translateY(-5px); border-color: #8b5cf6; }
+
+        .featured-star {
+            position: absolute; 
+            /* 좌측 상단(top, left)에서 -> 우측 하단(bottom, right)으로 변경 */
+            bottom: 15px; 
+            right: 15px; 
+            z-index: 10;
+            background: linear-gradient(45deg, #f59e0b, #eab308);
+            color: #000; font-weight: 800; font-size: 0.75rem;
+            padding: 4px 10px; border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(234, 179, 8, 0.4);
+            display: none; /* JS로 제어 */
+        }
+        .song-card.is-featured .featured-star { display: block; }
+
+        .card-header-bg {
+            padding: 20px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            position: relative;
+        }
+        
+        .class-badge {
+            position: absolute; top: 15px; right: 15px;
+            background: rgba(255,255,255,0.1); padding: 4px 10px;
+            border-radius: 10px; font-size: 0.75rem; color: #aaa;
+        }
+
+        .song-title-sm { font-size: 1.2rem; font-weight: 700; color: #fff; margin-top: 15px; }
+        .card-content { padding: 20px; }
+        .song-desc { font-size: 0.9rem; color: #888; margin-bottom: 20px; height: 40px; overflow: hidden; }
+
+        .btn-listen {
+            display: block; width: 100%;
+            padding: 12px; background: #222; color: #fff;
+            text-align: center; border-radius: 10px; text-decoration: none;
+            font-weight: 600; border: 1px solid #333; transition: all 0.2s;
+        }
+        .btn-listen:hover { background: #8b5cf6; color: #fff; border-color: #8b5cf6; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .bento-grid { grid-template-columns: 1fr; }
+            .winner-title { font-size: 2.5rem; }
+            .winner-card { min-height: 400px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- Header -->
+        <header>
+            <div class="badge-header">History X AI Music Project</div>
+            <!-- 메인 타이틀 (큰 글씨) -->
+            <h1>시대를 노래하다</h1>
+            <!-- 서브 타이틀 (작은 글씨, 스타일 적용) -->
+            <p class="subtitle">VOTING RESULTS</p>
+            
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="switchTab('result')">🏆 결과 발표</button>
+                <button class="tab-btn" onclick="switchTab('list')">🎵 전체 곡 목록</button>
+            </div>
+        </header>
+
+        <!-- TAB 1: Result View (Bento Grid) -->
+        <div id="result-view" class="result-view active">
+            <div class="bento-grid">
+                
+                <!-- Left: Winner -->
+                <div class="winner-card">
+                    <div class="winner-bg"></div>
+                    <div class="winner-content">
+                        <div class="rank-badge">GRAND PRIZE</div>
+                        <div class="winner-title">월세의 밤</div>
+                        <p style="color: #ccc; font-size: 1.1rem; line-height: 1.6;">"차가운 도시의 불빛 아래,<br>홀로 지새우는 청춘의 밤을 노래하다"</p>
+                        
+                        <div class="winner-stats">
+                            <div class="vote-big">20 Votes</div>
+                            <div class="tag-pill">주거 불안정</div>
+                            <div class="tag-pill">1학년 2반</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Stack -->
+                <div class="right-col">
+                    <!-- Top 2 & 3 -->
+                    <div class="runner-row">
+                        <div class="runner-card">
+                            <div class="runner-header">
+                                <div class="runner-rank rank-2">02</div>
+                            </div>
+                            <div>
+                                <h3 style="color:#fff; margin-bottom:5px;">멈춰버린 시계 바늘</h3>
+                                <p style="font-size:0.8rem; color:#888;">청년 실업 / 1-3</p>
+                                <p style="font-size:1.2rem; color:#fff; font-weight:700; margin-top:10px;">9 Votes</p>
+                            </div>
+                        </div>
+                        <div class="runner-card">
+                            <div class="runner-header">
+                                <div class="runner-rank rank-3">03</div>
+                            </div>
+                            <div>
+                                <h3 style="color:#fff; margin-bottom:5px;">멸종위기종</h3>
+                                <p style="font-size:0.8rem; color:#888;">기후 위기 / 1-1</p>
+                                <p style="font-size:1.2rem; color:#fff; font-weight:700; margin-top:10px;">8 Votes</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- List & Analytics -->
+                    <div class="analytics-box">
+                        <div class="list-header">우수작 (HONORABLE MENTIONS)</div>
+                        <div class="rank-item">
+                            <span class="rank-num">04</span>
+                            <span class="rank-name">14월의 바람, 자유의 숨결</span>
+                            <span class="rank-val">7</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-num">05</span>
+                            <span class="rank-name">나의 무대</span>
+                            <span class="rank-val">6</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-num">06</span>
+                            <span class="rank-name">제2의 세계</span>
+                            <span class="rank-val">4</span>
+                        </div>
+
+                        <div class="list-header" style="margin-top: 30px;">주제별 득표 트렌드</div>
+                        
+                        <!-- Fixed: Added data-width to store value safely -->
+                        <div class="chart-row">
+                            <div class="chart-label"><span>청년 실업</span><span>33%</span></div>
+                            <div class="chart-bg"><div class="chart-fill" data-width="33%" style="width: 33%; background: #00ffff;"></div></div>
+                        </div>
+                        <div class="chart-row">
+                            <div class="chart-label"><span>주거 불안정</span><span>31%</span></div>
+                            <div class="chart-bg"><div class="chart-fill" data-width="31%" style="width: 31%; background: #39ff14;"></div></div>
+                        </div>
+                        <div class="chart-row">
+                            <div class="chart-label"><span>역사 (민주화)</span><span>16%</span></div>
+                            <div class="chart-bg"><div class="chart-fill" data-width="16%" style="width: 16%; background: #ff00ff;"></div></div>
+                        </div>
+                        <div class="chart-row">
+                            <div class="chart-label"><span>기후 위기</span><span>12%</span></div>
+                            <div class="chart-bg"><div class="chart-fill" data-width="12%" style="width: 12%; background: #ffd700;"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: List View -->
+        <div id="list-view" class="list-view">
+            <!-- Filter Bar -->
+            <div class="list-filter-bar">
+                <button class="filter-chip active" onclick="filterSongs('featured')">⭐ 각 반 대표곡 (10)</button>
+                <button class="filter-chip" onclick="filterSongs('all')">📋 전체 플레이리스트 (22)</button>
+            </div>
+
+            <div class="songs-grid" id="songs-container">
+                <!-- JS will inject songs here -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 전체 22곡 데이터
+        const songsData = [
+            { id: 1, title: "4월의 바람, 자유의 숨결", theme: "4.19혁명", class: "1-1", link: "https://suno.com/s/VkDLvbkzhWbHRuON", desc: "부정선거에 맞선 청춘들의 함성을 시적으로 담아낸 발라드", featured: true },
+            { id: 2, title: "로드맵", theme: "AI 시대", class: "1-1", link: "https://suno.com/s/k2bjEhFRotxxQ4PR", desc: "정해진 길이 아닌 나만의 길을 찾아가는 청춘의 고민", featured: false },
+            { id: 3, title: "멸종위기종", theme: "기후 위기", class: "1-1", link: "https://suno.com/s/JRix4VI15GOpK3B4", desc: "기후 위기를 '시스템 에러'에 비유한 트렌디한 힙합", featured: true },
+            { id: 4, title: "탁! 치니 억! (침묵을 찢다)", theme: "민주항쟁", class: "1-1", link: "https://suno.com/s/WvoXuU8IKDV9TdjL", desc: "6월 항쟁의 도화선을 강렬한 비트로 표현한 역사 랩", featured: false },
+            { id: 5, title: "Stranger", theme: "AI 시대", class: "1-1", link: "https://suno.com/s/SmRK3EuKx9jN9Ogw", desc: "서울에서 이방인처럼 살아가는 청춘의 고독한 독백", featured: false },
+            { id: 6, title: "자화자찬", theme: "SNS중독", class: "1-2", link: "https://suno.com/s/BePIDYanfUNS38E2", desc: "SNS 속 가짜 자아와 스펙 경쟁 사회를 풍자한 랩", featured: false },
+            { id: 7, title: "월세의 밤", theme: "주거 불안정", class: "1-2", link: "https://suno.com/s/0I3PYIQ9ufObZyqB", desc: "중독성 강한 훅(Hook)으로 청춘의 애환을 노래하다", featured: true },
+            { id: 8, title: "도시의 그림자", theme: "도시화/산업화", class: "1-2", link: "https://suno.com/s/6qGGwb5d9vdfRl9C", desc: "빠르게 변하는 도시에서 잃어버린 것들에 대한 향수", featured: false },
+            { id: 9, title: "고가도로 아래서", theme: "산업화", class: "1-2", link: "https://suno.com/s/TvLceo2qlFpcqKz1", desc: "7080 산업화 시대의 풍경을 영화처럼 그려낸 서정곡", featured: true },
+            { id: 10, title: "플라스틱 바다", theme: "기후 위기", class: "1-2", link: "https://suno.com/s/iGxnBzr4cG5bakbF", desc: "환경 파괴와 청춘의 외로움을 겹쳐 표현한 감성곡", featured: false },
+            { id: 11, title: "초라한 골목", theme: "주거 불안", class: "1-2", link: "https://suno.com/s/SYKHyfBwweRpSGqG", desc: "좁은 월세방에서도 꿈을 포기하지 않는 청년의 다짐", featured: false },
+            { id: 12, title: "멈춰버린 시계 바늘", theme: "청년 실업", class: "1-3", link: "https://suno.com/s/u5pbM6lyTATlWPYd", desc: "취업 실패의 좌절 속에서도 다시 일어서는 용기", featured: true },
+            { id: 13, title: "5월의 청춘", theme: "5.18민주화 운동", class: "1-3", link: "https://suno.com/s/2VL6yzz53NlOGoDP", desc: "평범한 청년의 시선으로 5.18을 웅장하게 담아낸 대서사시", featured: true },
+            { id: 14, title: "네 평의 서울", theme: "청년 실업", class: "1-3", link: "https://suno.com/s/Ow8DEDwjlddXQAGl", desc: "좁은 방에서 꿈꾸는 청춘의 소박하지만 간절한 바람", featured: false },
+            { id: 15, title: "빌딩 숲, 별을 찾는 밤", theme: "청년 실업", class: "1-3", link: "https://suno.com/s/lqnENylMrFVtFv4l", desc: "빌딩 숲 속에서 별을 찾는 청년의 고독과 희망을 담은 서정적 발라드", featured: false },
+            { id: 16, title: "서울살이", theme: "주거 불안정", class: "1-4", link: "https://suno.com/s/DmsaVZPSSqy5k3tX", desc: "창문 없는 방에서 월세를 걱정하는 지방 청년의 현실을 절절하게 담은 발라드", featured: false },
+            { id: 17, title: "제2의 세계", theme: "AI 시대", class: "1-4", link: "https://suno.com/s/31e7yQLaNkrNICk7", desc: "AI의 편리함 이면에 숨겨진 인간 자율성 상실의 위험 경고", featured: true },
+            { id: 18, title: "골목길", theme: "서울 적응기", class: "1-4", link: "https://suno.com/s/Yy1pe0HZ1X52dDl1", desc: "낯선 서울 골목길에서 자신의 길을 찾아가는 청년의 성장담", featured: false },
+            { id: 19, title: "억압 속 자유를 꿈꾸며", theme: "AI 시대", class: "1-4", link: "https://suno.com/s/67AhTII1MoGNUxOP", desc: "기계화된 사회에서 인간성과 자유를 찾는 서정적 발라드", featured: false },
+            { id: 20, title: "청년들의 꿈상실", theme: "청년 실업", class: "1-4", link: "https://suno.com/song/14ee3bd1-7880-4433-bf1a-e5f6d540bd67", desc: "로그아웃하고 싶을 만큼 지쳐버린 디지털 세대 청년의 절규", featured: true },
+            { id: 21, title: "Hyunung's Way", theme: "청년 실업", class: "1-5", link: "https://suno.com/s/4c5B1tw9nQxTHtZO", desc: "취업난 속에서도 '나만의 길'을 가겠다는 당찬 에너지", featured: true },
+            { id: 22, title: "나의 무대", theme: "청년 실업", class: "1-5", link: "https://suno.com/s/2OBMSBf2Xpns2vbz", desc: "일터를 '꿈의 무대'로 바꾼 긍정의 힘, 뮤지컬 같은 곡", featured: true }
+        ];
+
+        let currentFilter = 'featured';
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if(tabName === 'result') {
+                document.getElementById('result-view').classList.add('active');
+                document.getElementById('list-view').classList.remove('active');
+                animateCharts();
+            } else {
+                document.getElementById('result-view').classList.remove('active');
+                document.getElementById('list-view').classList.add('active');
+                renderSongs();
+            }
+        }
+
+        function filterSongs(filterType) {
+            currentFilter = filterType;
+            document.querySelectorAll('.filter-chip').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderSongs();
+        }
+
+        function renderSongs() {
+            const container = document.getElementById('songs-container');
+            const filteredData = currentFilter === 'featured' 
+                ? songsData.filter(s => s.featured) 
+                : songsData;
+
+            const html = filteredData.map(song => `
+                <div class="song-card ${song.featured ? 'is-featured' : ''}">
+                    <div class="featured-star">⭐ PICK</div>
+                    <div class="card-header-bg">
+                        <div class="class-badge">${song.class}반</div>
+                        <div style="font-size:0.8rem; color:#aaa;">${song.theme}</div>
+                        <div class="song-title-sm">${song.title}</div>
+                    </div>
+                    <div class="card-content">
+                        <p class="song-desc">${song.desc}</p>
+                        <a href="${song.link}" target="_blank" class="btn-listen">
+                            ▶ 감상하기
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+            container.innerHTML = html;
+        }
+
+        function animateCharts() {
+            document.querySelectorAll('.chart-fill').forEach(el => {
+                const targetWidth = el.getAttribute('data-width');
+                if (!targetWidth) return;
+                
+                el.style.width = '0';
+                setTimeout(() => {
+                    el.style.width = targetWidth;
+                }, 100);
+            });
+        }
+        
+        window.onload = function() {
+            animateCharts();
+            renderSongs();
+        };
+    </script>
+</body>
+</html>
